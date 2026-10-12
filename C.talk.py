@@ -1,300 +1,198 @@
-
 import streamlit as st
 import pandas as pd
 import html
+import base64
+from pathlib import Path
 
-
-# =========================================================
 # تنظیمات صفحه
-# =========================================================
-
 st.set_page_config(
     page_title="C.Talk",
-    page_icon="✓",
+    page_icon="🎟️",
     layout="centered"
 )
 
+# نام فایل اکسل
+EXCEL_FILE = "attendees_list_2026-10-11_13_01_24_e719cd20ff0fff1cb7bcc011a30c8670.xlsx"
 
-# =========================================================
-# CSS و طراحی صفحه
-# =========================================================
+# خواندن تصویر پس‌زمینه
+try:
+    image_bytes = Path("c.jpg").read_bytes()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    background_image = f"url('data:image/jpeg;base64,{image_base64}')"
+except FileNotFoundError:
+    background_image = "none"
 
+# طراحی ظاهری
 st.markdown(
-    """
+    f"""
     <style>
-    .block-container {
+    .stApp {{
+        background: linear-gradient(135deg, #4b0082, #8a2be2);
+        min-height: 100vh;
+    }}
+
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: {background_image};
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 0;
+    }}
+
+    .stApp > header {{
+        background: transparent;
+    }}
+
+    .stApp .main {{
+        position: relative;
+        z-index: 1;
+    }}
+
+    .block-container {{
+        position: relative;
+        z-index: 1;
         padding-top: 3rem;
         padding-bottom: 3rem;
-        max-width: 800px;
-    }
+    }}
 
-    .stApp {
-        background: linear-gradient(
-            135deg,
-            #f3e8ff 0%,
-            #e9d5ff 35%,
-            #c084fc 70%,
-            #7e22ce 100%
-        );
-        min-height: 100vh;
-    }
-
-    .ctalk-title {
+    h1 {{
+        color: white;
         text-align: center;
-        font-size: 90px;
-        font-weight: 900;
-        margin-top: 30px;
-        margin-bottom: 50px;
-        background: linear-gradient(
-            90deg,
-            #4c1d95,
-            #7e22ce,
-            #a855f7,
-            #c084fc,
-            #6d28d9
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
+        font-size: 3rem !important;
+        font-weight: 800 !important;
+    }}
 
-    .input-label {
-        font-size: 22px;
-        font-weight: 700;
-        color: #4c1d95;
+    .subtitle {{
+        color: white;
+        text-align: center;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }}
+
+    div[data-testid="stTextInput"] label {{
+        color: white !important;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }}
+
+    div[data-testid="stTextInput"] input {{
+        border-radius: 12px;
+        padding: 12px;
+    }}
+
+    .success-box {{
+        background: rgba(255, 255, 255, 0.95);
+        color: #222;
+        padding: 25px;
+        border-radius: 18px;
+        text-align: center;
+        margin-top: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }}
+
+    .success-box h2 {{
+        color: #228B22;
         margin-bottom: 10px;
-        text-align: center;
-    }
+    }}
 
-    .success-box {
-        margin-top: 30px;
-        padding: 25px;
-        border-radius: 18px;
-        background: linear-gradient(
-            90deg,
-            #dcfce7,
-            #bbf7d0
-        );
-        border: 2px solid #22c55e;
+    .error-box {{
+        background: rgba(255, 255, 255, 0.95);
+        color: #b00020;
+        padding: 20px;
+        border-radius: 15px;
         text-align: center;
-        color: #166534;
-        font-size: 30px;
-        font-weight: 800;
-    }
-
-    .welcome-box {
         margin-top: 20px;
-        padding: 15px 0;
-        text-align: center;
-        direction: rtl;
-        color: #581c87;
-        font-size: 27px;
-        font-weight: 800;
-        white-space: normal;
-    }
+        font-weight: bold;
+    }}
 
-    .error-box {
-        margin-top: 30px;
-        padding: 25px;
-        border-radius: 18px;
-        background: linear-gradient(
-            90deg,
-            #fee2e2,
-            #fecaca
-        );
-        border: 2px solid #ef4444;
-        text-align: center;
-        color: #991b1b;
-        font-size: 25px;
-        font-weight: 700;
-    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-
-# =========================================================
 # عنوان برنامه
-# =========================================================
-
+st.markdown("<h1>C.Talk</h1>", unsafe_allow_html=True)
 st.markdown(
-    '<div class="ctalk-title">C.Talk</div>',
+    '<div class="subtitle">به رویداد ما خوش آمدید</div>',
     unsafe_allow_html=True
 )
 
-
-# =========================================================
-# مسیر فایل Excel
-# فایل Excel باید کنار فایل پایتون در GitHub باشد
-# =========================================================
-
-FILE_NAME = (
-    "attendees_list_2026-10-11_13_01_24_"
-    "e719cd20ff0fff1cb7bcc011a30c8670.xlsx"
+# دریافت شماره بلیت
+ticket_number = st.text_input(
+    "شماره بلیت خود را وارد کنید",
+    placeholder="شماره بلیت..."
 )
 
-
-# =========================================================
-# خواندن فایل Excel
-# =========================================================
-
-try:
-    df = pd.read_excel(
-        FILE_NAME,
-        engine="openpyxl",
-        dtype={"شماره بلیت": str}
-    )
-
-except FileNotFoundError:
-    st.error(f"فایل Excel پیدا نشد: {FILE_NAME}")
-    st.stop()
-
-except ImportError:
-    st.error(
-        "کتابخانه openpyxl نصب نیست. "
-        "فایل requirements.txt را بررسی کنید."
-    )
-    st.stop()
-
-except Exception as e:
-    st.error(f"خطا در خواندن فایل Excel: {e}")
-    st.stop()
-
-
-# =========================================================
-# تمیز کردن نام ستون‌ها
-# =========================================================
-
-df.columns = df.columns.astype(str).str.strip()
-
-
-# =========================================================
-# بررسی ستون‌های موردنیاز
-# =========================================================
-
-required_columns = [
-    "شماره بلیت",
-    "نام",
-    "نام خانوادگی"
-]
-
-missing_columns = [
-    column
-    for column in required_columns
-    if column not in df.columns
-]
-
-if missing_columns:
-    st.error(
-        "ستون‌های زیر در فایل Excel پیدا نشدند: "
-        + "، ".join(missing_columns)
-    )
-
-    st.write(
-        "ستون‌های موجود در فایل Excel:",
-        df.columns.tolist()
-    )
-
-    st.stop()
-
-
-# =========================================================
-# آماده‌سازی شماره بلیت برای جستجو
-# =========================================================
-
-df["_code_for_search"] = (
-    df["شماره بلیت"]
-    .astype("string")
-    .str.strip()
-    .str.replace(r"\.0$", "", regex=True)
-)
-
-
-# =========================================================
-# عنوان و ورودی شماره بلیت
-# =========================================================
-
-st.markdown(
-    '<div class="input-label">کد خود را وارد کنید</div>',
-    unsafe_allow_html=True
-)
-
-user_code = st.text_input(
-    "شماره بلیت",
-    placeholder="مثلاً 123456",
-    label_visibility="collapsed"
-)
-
-
-# =========================================================
 # بررسی شماره بلیت
-# =========================================================
+if ticket_number:
+    try:
+        df = pd.read_excel(EXCEL_FILE, engine="openpyxl")
 
-if user_code:
+        # تمیز کردن نام ستون‌ها
+        df.columns = df.columns.astype(str).str.strip()
 
-    user_code = user_code.strip()
+        required_columns = ["شماره بلیت", "نام", "نام خانوادگی"]
 
-    matched_rows = df[
-        df["_code_for_search"] == user_code
-    ]
+        if not all(col in df.columns for col in required_columns):
+            st.error(
+                "ستون‌های موردنیاز در فایل اکسل پیدا نشدند. "
+                "لطفاً نام ستون‌ها را بررسی کنید."
+            )
+        else:
+            # تبدیل شماره بلیت‌ها به رشته و حذف فاصله‌ها
+            df["شماره بلیت"] = (
+                df["شماره بلیت"]
+                .fillna("")
+                .astype(str)
+                .str.strip()
+                .str.replace(r"\.0$", "", regex=True)
+            )
 
-    # -----------------------------------------------------
-    # شماره بلیت معتبر است
-    # -----------------------------------------------------
+            entered_ticket = ticket_number.strip()
 
-    if not matched_rows.empty:
+            # جست‌وجوی بلیت
+            matched = df[df["شماره بلیت"] == entered_ticket]
 
-        person = matched_rows.iloc[0]
+            if not matched.empty:
+                first_name = str(matched.iloc[0]["نام"]).strip()
+                last_name = str(matched.iloc[0]["نام خانوادگی"]).strip()
 
-        first_name = (
-            ""
-            if pd.isna(person["نام"])
-            else str(person["نام"]).strip()
+                full_name = html.escape(
+                    f"{first_name} {last_name}".strip()
+                )
+
+                st.markdown(
+                    f"""
+                    <div class="success-box">
+                        <h2>✅ بلیت شما تأیید شد</h2>
+                        <p style="font-size: 1.2rem;">
+                            خوش آمدید، <strong>{full_name}</strong>
+                        </p>
+                        <p>از حضور شما در رویداد C.Talk خوشحالیم.</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    """
+                    <div class="error-box">
+                        ❌ شماره بلیت معتبر نیست.
+                        لطفاً شماره بلیت خود را بررسی کنید.
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+    except FileNotFoundError:
+        st.error(
+            "فایل اکسل یا تصویر پس‌زمینه پیدا نشد. "
+            "لطفاً فایل‌ها را در مسیر صحیح قرار دهید."
         )
-
-        last_name = (
-            ""
-            if pd.isna(person["نام خانوادگی"])
-            else str(person["نام خانوادگی"]).strip()
-        )
-
-        person_name = f"{first_name} {last_name}".strip()
-
-        # نمایش تأیید
-        st.markdown(
-            """
-            <div class="success-box">
-                ✓ &nbsp; تأیید شد
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # نمایش نام کامل و پیام خوش‌آمدگویی
-        safe_name = html.escape(person_name)
-
-        st.markdown(
-            f"""
-            <div class="welcome-box">
-                {safe_name} عزیز،
-                به رویداد C.Talk خوش آمدید! 🎉
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    # -----------------------------------------------------
-    # شماره بلیت معتبر نیست
-    # -----------------------------------------------------
-
-    else:
-
-        st.markdown(
-            """
-            <div class="error-box">
-                ✕ &nbsp; این کد در سیستم وجود ندارد
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+    except Exception as e:
+        st.error(f"خطا در خواندن اطلاعات: {e}")
