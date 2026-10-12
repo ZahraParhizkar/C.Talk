@@ -1,6 +1,7 @@
-```python
+
 import streamlit as st
 import pandas as pd
+import html
 
 
 # =========================================================
@@ -21,7 +22,6 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-
     .block-container {
         padding-top: 3rem;
         padding-bottom: 3rem;
@@ -45,7 +45,6 @@ st.markdown(
         font-weight: 900;
         margin-top: 30px;
         margin-bottom: 50px;
-
         background: linear-gradient(
             90deg,
             #4c1d95,
@@ -54,7 +53,6 @@ st.markdown(
             #c084fc,
             #6d28d9
         );
-
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -72,13 +70,11 @@ st.markdown(
         margin-top: 30px;
         padding: 25px;
         border-radius: 18px;
-
         background: linear-gradient(
             90deg,
             #dcfce7,
             #bbf7d0
         );
-
         border: 2px solid #22c55e;
         text-align: center;
         color: #166534;
@@ -89,9 +85,6 @@ st.markdown(
     .welcome-box {
         margin-top: 20px;
         padding: 15px 0;
-        background: transparent;
-        border: none;
-        border-radius: 0;
         text-align: center;
         direction: rtl;
         color: #581c87;
@@ -104,20 +97,17 @@ st.markdown(
         margin-top: 30px;
         padding: 25px;
         border-radius: 18px;
-
         background: linear-gradient(
             90deg,
             #fee2e2,
             #fecaca
         );
-
         border: 2px solid #ef4444;
         text-align: center;
         color: #991b1b;
         font-size: 25px;
         font-weight: 700;
     }
-
     </style>
     """,
     unsafe_allow_html=True
@@ -136,7 +126,7 @@ st.markdown(
 
 # =========================================================
 # مسیر فایل Excel
-# فایل باید در مخزن GitHub کنار app.py باشد
+# فایل Excel باید کنار فایل پایتون در GitHub باشد
 # =========================================================
 
 FILE_NAME = (
@@ -150,18 +140,20 @@ FILE_NAME = (
 # =========================================================
 
 try:
-    df = pd.read_excel(FILE_NAME, engine="openpyxl")
+    df = pd.read_excel(
+        FILE_NAME,
+        engine="openpyxl",
+        dtype={"شماره بلیت": str}
+    )
 
 except FileNotFoundError:
-    st.error(
-        f"فایل Excel پیدا نشد: {FILE_NAME}"
-    )
+    st.error(f"فایل Excel پیدا نشد: {FILE_NAME}")
     st.stop()
 
 except ImportError:
     st.error(
         "کتابخانه openpyxl نصب نیست. "
-        "آن را به فایل requirements.txt اضافه کنید."
+        "فایل requirements.txt را بررسی کنید."
     )
     st.stop()
 
@@ -174,60 +166,36 @@ except Exception as e:
 # تمیز کردن نام ستون‌ها
 # =========================================================
 
-df.columns = (
-    df.columns
-    .astype(str)
-    .str.strip()
-)
+df.columns = df.columns.astype(str).str.strip()
 
 
 # =========================================================
-# پیدا کردن ستون شماره بلیت
+# بررسی ستون‌های موردنیاز
 # =========================================================
 
-code_column = None
+required_columns = [
+    "شماره بلیت",
+    "نام",
+    "نام خانوادگی"
+]
 
-for column in df.columns:
-    if column == "شماره بلیت":
-        code_column = column
-        break
+missing_columns = [
+    column
+    for column in required_columns
+    if column not in df.columns
+]
 
-if code_column is None:
+if missing_columns:
     st.error(
-        "ستون «شماره بلیت» در فایل Excel پیدا نشد."
+        "ستون‌های زیر در فایل Excel پیدا نشدند: "
+        + "، ".join(missing_columns)
     )
-    st.write("ستون‌های موجود:", df.columns.tolist())
-    st.stop()
 
-
-# =========================================================
-# پیدا کردن ستون نام و نام خانوادگی
-# =========================================================
-
-name_column = None
-surname_column = None
-
-for column in df.columns:
-    if column == "نام":
-        name_column = column
-
-    elif column == "نام خانوادگی":
-        surname_column = column
-
-
-if name_column is None:
-    st.error(
-        "ستون «نام» در فایل Excel پیدا نشد."
+    st.write(
+        "ستون‌های موجود در فایل Excel:",
+        df.columns.tolist()
     )
-    st.write("ستون‌های موجود:", df.columns.tolist())
-    st.stop()
 
-
-if surname_column is None:
-    st.error(
-        "ستون «نام خانوادگی» در فایل Excel پیدا نشد."
-    )
-    st.write("ستون‌های موجود:", df.columns.tolist())
     st.stop()
 
 
@@ -236,7 +204,7 @@ if surname_column is None:
 # =========================================================
 
 df["_code_for_search"] = (
-    df[code_column]
+    df["شماره بلیت"]
     .astype("string")
     .str.strip()
     .str.replace(r"\.0$", "", regex=True)
@@ -244,7 +212,7 @@ df["_code_for_search"] = (
 
 
 # =========================================================
-# عنوان ورودی کد
+# عنوان و ورودی شماره بلیت
 # =========================================================
 
 st.markdown(
@@ -252,13 +220,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# =========================================================
-# ورودی شماره بلیت
-# =========================================================
-
 user_code = st.text_input(
-    "",
+    "شماره بلیت",
     placeholder="مثلاً 123456",
     label_visibility="collapsed"
 )
@@ -276,33 +239,29 @@ if user_code:
         df["_code_for_search"] == user_code
     ]
 
-
-    # =====================================================
-    # اگر شماره بلیت معتبر باشد
-    # =====================================================
+    # -----------------------------------------------------
+    # شماره بلیت معتبر است
+    # -----------------------------------------------------
 
     if not matched_rows.empty:
 
         person = matched_rows.iloc[0]
 
-        # دریافت نام و نام خانوادگی از همان ردیف
         first_name = (
             ""
-            if pd.isna(person[name_column])
-            else str(person[name_column]).strip()
+            if pd.isna(person["نام"])
+            else str(person["نام"]).strip()
         )
 
         last_name = (
             ""
-            if pd.isna(person[surname_column])
-            else str(person[surname_column]).strip()
+            if pd.isna(person["نام خانوادگی"])
+            else str(person["نام خانوادگی"]).strip()
         )
 
-        # اتصال نام و نام خانوادگی
         person_name = f"{first_name} {last_name}".strip()
 
-
-        # نمایش نتیجه تأیید
+        # نمایش تأیید
         st.markdown(
             """
             <div class="success-box">
@@ -312,32 +271,22 @@ if user_code:
             unsafe_allow_html=True
         )
 
-
-        # نمایش پیام خوش‌آمدگویی
-        # escape برای جلوگیری از تفسیر HTML در نام ورودی
-        safe_person_name = (
-            person_name
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace('"', "&quot;")
-            .replace("'", "&#x27;")
-        )
+        # نمایش نام کامل و پیام خوش‌آمدگویی
+        safe_name = html.escape(person_name)
 
         st.markdown(
             f"""
             <div class="welcome-box">
-                {safe_person_name} عزیز،
+                {safe_name} عزیز،
                 به رویداد C.Talk خوش آمدید! 🎉
             </div>
             """,
             unsafe_allow_html=True
         )
 
-
-    # =====================================================
-    # اگر شماره بلیت معتبر نباشد
-    # =====================================================
+    # -----------------------------------------------------
+    # شماره بلیت معتبر نیست
+    # -----------------------------------------------------
 
     else:
 
@@ -349,4 +298,3 @@ if user_code:
             """,
             unsafe_allow_html=True
         )
-```
