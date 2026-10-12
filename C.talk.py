@@ -26,9 +26,11 @@ except FileNotFoundError:
 st.markdown(
     f"""
     <style>
+    /* حذف رنگ پس‌زمینه و نمایش تصویر با شفافیت */
     .stApp {{
-        background: linear-gradient(135deg, #4b0082, #8a2be2);
+        background: transparent !important;
         min-height: 100vh;
+        direction: rtl;
     }}
 
     .stApp::before {{
@@ -48,64 +50,92 @@ st.markdown(
         background: transparent;
     }}
 
-    .stApp .main {{
-        position: relative;
-        z-index: 1;
-    }}
-
+    .stApp .main,
     .block-container {{
         position: relative;
         z-index: 1;
+        direction: rtl;
+        text-align: right;
+    }}
+
+    .block-container {{
         padding-top: 3rem;
         padding-bottom: 3rem;
     }}
 
+    /* عنوان بزرگ با طیف بنفش، صورتی و یاسی */
     h1 {{
-        color: white;
+        direction: ltr;
         text-align: center;
-        font-size: 3rem !important;
-        font-weight: 800 !important;
+        font-size: 5rem !important;
+        font-weight: 900 !important;
+        background: linear-gradient(
+            90deg,
+            #7B2FF7,
+            #F107A3,
+            #C8A2FF,
+            #9B5DE5
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-bottom: 1rem;
     }}
 
+    /* زیرعنوان فارسی */
     .subtitle {{
-        color: white;
+        direction: rtl;
+        color: #6A3D8F;
         text-align: center;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         margin-bottom: 2rem;
     }}
 
+    /* راست‌چین کردن برچسب ورودی */
     div[data-testid="stTextInput"] label {{
-        color: white !important;
+        direction: rtl;
+        text-align: right;
+        display: block;
+        color: #55306F !important;
         font-size: 1.1rem;
         font-weight: bold;
     }}
 
+    /* ورودی شماره بلیت */
     div[data-testid="stTextInput"] input {{
         border-radius: 12px;
         padding: 12px;
+        direction: rtl;
+        text-align: right;
     }}
 
+    /* پیام تأیید */
     .success-box {{
+        direction: rtl;
         background: rgba(255, 255, 255, 0.95);
         color: #222;
         padding: 25px;
         border-radius: 18px;
-        text-align: center;
+        text-align: right;
         margin-top: 25px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }}
 
     .success-box h2 {{
         color: #228B22;
+        text-align: right;
         margin-bottom: 10px;
     }}
 
+    /* پیام خطا */
     .error-box {{
+        direction: rtl;
         background: rgba(255, 255, 255, 0.95);
         color: #b00020;
         padding: 20px;
         border-radius: 15px;
-        text-align: center;
+        text-align: right;
         margin-top: 20px;
         font-weight: bold;
     }}
@@ -116,7 +146,11 @@ st.markdown(
 )
 
 # عنوان برنامه
-st.markdown("<h1>C.Talk</h1>", unsafe_allow_html=True)
+st.markdown(
+    '<h1>C.Talk</h1>',
+    unsafe_allow_html=True
+)
+
 st.markdown(
     '<div class="subtitle">به رویداد ما خوش آمدید</div>',
     unsafe_allow_html=True
@@ -191,8 +225,8 @@ if ticket_number:
 
     except FileNotFoundError:
         st.error(
-            "فایل اکسل یا تصویر پس‌زمینه پیدا نشد. "
-            "لطفاً فایل‌ها را در مسیر صحیح قرار دهید."
+            "فایل اکسل پیدا نشد. "
+            "لطفاً نام و محل فایل اکسل را بررسی کنید."
         )
     except Exception as e:
         st.error(f"خطا در خواندن اطلاعات: {e}")
