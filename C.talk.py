@@ -66,7 +66,7 @@ st.markdown(
     h1 {{
         direction: ltr;
         text-align: center;
-        font-size: 5rem !important;
+        font-size: 10rem !important;
         font-weight: 900 !important;
         background: linear-gradient(
             90deg,
@@ -156,10 +156,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(
-    '<div class="subtitle">به رویداد ما خوش آمدید</div>',
-    unsafe_allow_html=True
-)
 
 # دریافت شماره بلیت
 ticket_number = st.text_input(
