@@ -114,7 +114,7 @@ st.markdown(
         color: #222;
         padding: 25px;
         border-radius: 18px;
-        text-align: right;
+        text-align: center;
         margin-top: 25px;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }}
