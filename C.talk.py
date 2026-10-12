@@ -200,18 +200,28 @@ if ticket_number:
                     f"{first_name} {last_name}".strip()
                 )
 
-                st.markdown(
-                    f"""
-                    <div class="success-box">
-                        <h2>✅ بلیت شما تأیید شد</h2>
-                        <p style="font-size: 1.2rem;">
-                            خوش آمدید، <strong>{full_name}</strong>
-                        </p>
-                        <p>از حضور شما در رویداد C.Talk خوشحالیم.</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+        # نمایش تأیید
+        st.markdown(
+            """
+            <div class="success-box">
+                ✓ &nbsp; تأیید شد
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # نمایش نام کامل و پیام خوش‌آمدگویی
+        safe_name = html.escape(person_name)
+
+        st.markdown(
+            f"""
+            <div class="welcome-box">
+                {safe_name} عزیز،
+                به رویداد C.Talk خوش آمدید! 🎉
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
             else:
                 st.markdown(
                     """
