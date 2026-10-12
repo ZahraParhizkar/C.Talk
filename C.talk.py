@@ -26,7 +26,6 @@ except FileNotFoundError:
 st.markdown(
     f"""
     <style>
-    /* حذف رنگ پس‌زمینه و نمایش تصویر با شفافیت */
     .stApp {{
         background: transparent !important;
         min-height: 100vh;
@@ -83,7 +82,6 @@ st.markdown(
         margin-bottom: 1rem;
     }}
 
-    /* زیرعنوان فارسی */
     .subtitle {{
         direction: rtl;
         color: #6A3D8F;
@@ -92,7 +90,7 @@ st.markdown(
         margin-bottom: 2rem;
     }}
 
-    /* راست‌چین کردن برچسب ورودی */
+    /* ورودی شماره بلیت */
     div[data-testid="stTextInput"] label {{
         direction: rtl;
         text-align: right;
@@ -102,7 +100,6 @@ st.markdown(
         font-weight: bold;
     }}
 
-    /* ورودی شماره بلیت */
     div[data-testid="stTextInput"] input {{
         border-radius: 12px;
         padding: 12px;
@@ -126,6 +123,14 @@ st.markdown(
         color: #228B22;
         text-align: right;
         margin-bottom: 10px;
+    }}
+
+    .welcome-message {{
+        font-size: 1.2rem;
+        text-align: right;
+        direction: rtl;
+        white-space: nowrap;
+        margin-bottom: 0;
     }}
 
     /* پیام خطا */
@@ -200,28 +205,20 @@ if ticket_number:
                     f"{first_name} {last_name}".strip()
                 )
 
-        # نمایش تأیید
-        st.markdown(
-            """
-            <div class="success-box">
-                ✓ &nbsp; تأیید شد
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                # پیام تأیید در یک سطر و راست‌چین
+                st.markdown(
+                    f"""
+                    <div class="success-box" dir="rtl">
+                        <h2>✅ بلیت شما تأیید شد</h2>
+                        <p class="welcome-message">
+                            <strong>{full_name} عزیز،</strong>
+                            به رویداد C.Talk خوش آمدید.
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-        # نمایش نام کامل و پیام خوش‌آمدگویی
-        safe_name = html.escape(person_name)
-
-        st.markdown(
-            f"""
-            <div class="welcome-box">
-                {safe_name} عزیز،
-                به رویداد C.Talk خوش آمدید! 🎉
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
             else:
                 st.markdown(
                     """
@@ -238,5 +235,6 @@ if ticket_number:
             "فایل اکسل پیدا نشد. "
             "لطفاً نام و محل فایل اکسل را بررسی کنید."
         )
+
     except Exception as e:
         st.error(f"خطا در خواندن اطلاعات: {e}")
