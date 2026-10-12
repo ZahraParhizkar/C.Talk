@@ -121,7 +121,7 @@ st.markdown(
 
     .success-box h2 {{
         color: #228B22;
-        text-align: right;
+        text-align: center;
         margin-bottom: 10px;
     }}
 
