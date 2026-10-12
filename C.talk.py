@@ -127,7 +127,7 @@ st.markdown(
 
     .welcome-message {{
         font-size: 1.2rem;
-        text-align: right;
+        text-align: center;
         direction: rtl;
         white-space: nowrap;
         margin-bottom: 0;
