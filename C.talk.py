@@ -207,7 +207,7 @@ st.markdown(
 # خواندن فایل Excel
 # =========================================================
 
-FILE_NAME = r"C:\Users\Sahra\Desktop\codes.xlsx"
+FILE_NAME = r"attendees_list_2026-10-11_13_01_24_e719cd20ff0fff1cb7bcc011a30c8670.xlsx"
 
 
 try:
@@ -253,7 +253,7 @@ code_column = None
 
 for column in df.columns:
 
-    if column.strip() == "کد":
+    if column.strip() == "شماره بلیت":
 
         code_column = column
 
