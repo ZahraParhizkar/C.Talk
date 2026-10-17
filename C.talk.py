@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # نام فایل اکسل
-EXCEL_FILE = "attendees_list_2026-10-11_13_01_24_e719cd20ff0fff1cb7bcc011a30c8670.xlsx"
+EXCEL_FILE = "attendees_list_2026-10-17_09_47_10_cc5ee4a014355e7d3ebd74416dca5325.xlsx"
 
 # خواندن تصویر پس‌زمینه
 try:
